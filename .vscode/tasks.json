@@ -1,0 +1,21 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+    {
+    "label": "python",
+    "type": "shell",
+    //command的后面的参数是：python的安装路径/python
+    "command": "F:\\Anaconda3\\python.exe",         
+    "args": [
+    "${file}"
+    ],
+    "group": {
+    "kind": "build",
+    "isDefault": true
+       }
+      }
+     ]
+    }
+    
