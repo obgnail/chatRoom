@@ -7,7 +7,7 @@ POST = 8080
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))      # 项目路径
 STATIC_DIR = os.path.join(BASE_DIR, 'websocket\static')       # 静态文件路径
 
-
+# mysql
 DATABASE = {
 	'database' : 'aiohttpwebsocket',
 	'user' : 'root',
@@ -15,5 +15,13 @@ DATABASE = {
 	'host' : 'localhost',
 	'charset' : 'utf8',
 	'echo' : True,
+}
+
+
+# redis
+REDIS = {
+	'HOST':'localhost',
+	'POST':6379,
+	'DB':5,
 }
 

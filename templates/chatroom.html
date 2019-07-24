@@ -1,0 +1,170 @@
+{% extends 'base.html' %} 
+
+{% block title %} 
+    网络聊天室 | 凉薄 
+{% endblock title %} 
+
+{% block mycss %} 
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.css" rel="stylesheet">
+    <style>
+        td {
+            border: 1px #000 solid;
+            margin: 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+{% endblock mycss %}
+
+{% block myjs %}
+<script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+    function websocket_func(username) {
+        var ws,myid;
+        // 打开一个 web socket,链接服务器
+        var wsUri = (window.location.protocol == 'https:' && 'wss://' || 'ws://') + window.location.host + '/chat/';
+        ws = new WebSocket(wsUri);
+        ws.onopen = function () {
+            // WebSocket 已连接上，使用 WebSocket 的 send() 方法尝试发送数据
+            ws.send(username);
+        };
+        //监听服务端是否有消息发送过来，当有消息时执行方法
+        ws.onmessage = function (evt) {
+            //获取服务器发来的消息
+            var received_msg = evt.data;
+            //判断是返回的是消息还是用户列表和id，1是消息，0是用户列表和id
+            msg = eval("(" + received_msg + ")")
+            //用户列表和id
+            if (msg.type == 0) {
+                //userid为空表示更新用户列表,不需要更新自己的id，否则为初次登录
+                if (msg.userid != null) {
+                    myid = msg.userid
+                    $("#userid").append(myid)
+                }
+                //当收到新的用户列表时，清空原来的用户列表,清空原来的用户选择框,添加群组发送选项
+                $("#userlist").empty()
+                $("#isgroup").empty()
+                $("#isgroup").append("<option value='1'>群发（或选择要私聊的用户）</option>")
+                for (var i = 0; i < msg.userlist.length; i++) {
+                    //填充用户列表
+                    $("#userlist").append(msg.userlist[i] + "<hr />")
+                    //填充用户选择框
+                    $("#isgroup").append("<option value='" + msg.userlist[i] + "'>" + msg.userlist[i] + "</option>")
+                }
+            }
+            //用户发送的消息
+            else {
+                var myDate = new Date();
+                nowtime = myDate.toLocaleString(); //获取日期与时间
+                newmsg = ""
+                //判断是自己的消息，绿色显示
+                if (myid == msg.data.user) {
+                    newmsg = "<span style='color:red'>" + msg.data.user + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + nowtime + "<br />" + msg.data.msg + "</span>" + "<br />"
+                } else {
+                    newmsg = "<span >" + msg.data.user + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + nowtime + "<br />" + msg.data.msg + "</span>" + "<br />"
+                }
+                $("#historymsg").append(newmsg)
+            }
+        };
+        //关闭页面或其他行为导致与服务器断开链接是执行
+        ws.onclose = function () {
+            // 关闭 websocket
+            alert("连接已关闭...");
+        };
+    }
+
+    function send() {
+        msgtxt = $("#msg").val()
+        msguser = $("#isgroup").val()
+        //判断是否是群发,1是群发，0是私聊
+        if ($("#isgroup").val() == "1") {
+            msg = {
+                type: "1",
+                txt: msgtxt,
+                userfrom: myid,
+                'csrfmiddlewaretoken':'{{ csrf_token }}',
+            }
+        } else {
+            msg = {
+                type: "0",
+                txt: msgtxt,
+                userto: msguser,
+                userfrom: myid,
+                'csrfmiddlewaretoken':'{{ csrf_token }}',
+            }
+        }
+        $.post("/", msg, function () {
+            $("#msg").val("")
+            $("#msg").focus()
+        })
+    }
+</script>
+
+<script>
+    function login_func() {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/login/",
+            data: $('#login_form').serialize(),
+            success: function(res, textStatus) {
+                if (textStatus == 'success' && res) {
+                    if(res['status'] == 1) {
+                        var username = res['username']
+                        websocket_func(username);
+                    }else{
+                        alert("用户已存在");
+                    }
+                }
+                else{
+                    alert("error");
+                }
+            }
+        });
+    }
+</script>
+{% endblock myjs %} 
+
+
+{% block content %}
+
+<body style="padding: 30px">
+<span>基于 WebSocket ，如显示 "您的浏览器不支持 WebSocket! " ,请退出</span>
+<br/>
+<form id='login_form'>
+    <input type="text" placeholder="用户名(不填则默认匿名)" name="user">
+    <input type="password" placeholder="密码" name="password"/>
+    <button type="button" onclick="login_func()">开始聊天</button>
+</form>
+
+<br/> 
+<span id="userid">当前账号：</span>
+
+<table>
+    <tr>
+        <td style="width: 500px;">
+            <div id="historymsg" style="height: 400px;overflow: auto"></div>
+        </td>
+        <td style="width: 400px">
+            <div id="userlist" style="height: 400px;overflow: auto"></div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <textarea id="msg"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <select class="form-control" id="isgroup">
+            </select>
+            <input class="btn btn-info btn-block" type="button" onclick="send()" value="发送">
+        </td>
+    </tr>
+</table>
+
+</body>
+{% endblock content %}

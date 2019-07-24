@@ -1,13 +1,14 @@
 import datetime
 from uuid import uuid4
 
+import redis
 import pymysql
 import sqlalchemy
 from sqlalchemy import create_engine,Boolean, Column, Integer, String, Text, ForeignKey ,DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship,mapper, sessionmaker
 
-from settings import DATABASE
+from settings import DATABASE,REDIS
 
 
 pymysql.install_as_MySQLdb()
@@ -18,6 +19,7 @@ engine = create_engine(connect.format(**DATABASE),echo=DATABASE['echo'])
 
 Base = declarative_base(engine)
 session = sessionmaker(bind=engine)()
+
 
 
 
@@ -47,6 +49,11 @@ class Message(Base):
 
     def __repr__(self):
         return '<Message: {}>'.format(self.content)
+
+
+async def init_redis(app):
+    r = redis.StrictRedis(host=REDIS['HOST'],port=REDIS['POST'],db=REDIS['DB'],decode_responses=True)
+    app['redis'] = r
 
 
 if __name__ == '__main__':
