@@ -2,10 +2,11 @@ from celery_app import app
 
 # from settings import DATABASE
 from db import session,User,Message
+from sqlalchemy import or_
 
+# 保存信息
 @app.task
 def add_message(from_user,to_user,content):
-    print('************ insert start ************')
     f_user = session.query(User.name).filter_by(name=from_user).first()[0]
     t_user = session.query(User.name).filter_by(name=to_user).first()[0]
 
@@ -39,5 +40,12 @@ def filter_sb_to_sb_message(from_user,to_user):
 
 
 @app.task
+def filter_sb_message(from_user,to_user):
+    return session.query(Message).filter(or_(Message.from_user==from_user,Message.to_user==to_user)).order_by(Message.createtime).all()
+
+
+@app.task
 def filter_all_to_all_message(to_user):
     return session.query(Message).filter_by(to_user='all').all()
+
+

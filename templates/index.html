@@ -8,24 +8,6 @@
     <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.css" rel="stylesheet">
 {% endblock mycss %}
 
-{% block myjs %}
-<script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
-
-
-<script>
-    window.onload = function () {
-        if ("WebSocket" in window) {
-            $("#can_use").text('你的浏览器支持webscoket')
-        }else{
-            $("#can_use").text('你的辣鸡浏览器不支持webscoket,请退群')
-        }
-    }
-</script>
-
-
-
-{% endblock myjs %} 
-
 
 {% block content %}
 
@@ -34,7 +16,7 @@
 <div style="text-align: center; margin-top: 60px" >
     <span id='can_use'>测试中...</span>
     <br/><br/>
-    <button id='anonymous' type="button" onclick="/" >匿名聊天</button>
+    <button type="button"><a href='/anonymous/'>匿名聊天</a></button>
  
     <br/><br/>
     {{ msg }}
@@ -45,13 +27,55 @@
     </form>
 
     <br/><br/>
-    <form id='register_form' action='/register/' method='post'>
-        <input type="text" placeholder="用户名" name="user">
-        <input type="password" placeholder="密码" name="password"/>
-        <input type="password" placeholder="确认密码" name="password"/>
-        <button type="button" onclick="/" >注册</button>
+    <form action='/register/' method='post'>
+        <input type="text" placeholder="用户名" name="user" required>
+        <input type="password" id="password" placeholder="密码" name="password" required/>
+        <input type="password" id="check_password" placeholder="确认密码" name="check_password" required/>
+        <input type="submit" value="注册"/>
     </form>
 </div>
 
 </body>
 {% endblock content %}
+
+
+
+
+{% block myjs %}
+<script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+<script>
+    function check_ws() {
+        if ("WebSocket" in window) {
+            $("#can_use").text('你的浏览器支持webscoket')
+        }else{
+            $("#can_use").text('你的辣鸡浏览器不支持webscoket,请退群')
+        }
+    }
+
+    function check_psw() {
+        document.getElementById("password").onchange = validatePassword;
+        document.getElementById("check_password").onchange = validatePassword;
+    }
+
+    function validatePassword() {
+        var pw = document.getElementById("password").value;
+        var cek_pw = document.getElementById("check_password").value;
+
+        if (pw != cek_pw) {
+            document.getElementById("check_password").setCustomValidity("Password Don't Mathch");
+        } else {
+            document.getElementById("check_password").setCustomValidity("");
+        }
+    }
+</script>
+
+<script>
+    window.onload = function () {
+        check_ws();
+        check_psw();
+    }
+</script>
+
+{% endblock myjs %} 

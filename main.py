@@ -22,8 +22,15 @@ async def init_app():
     app['websockets'] = {}
 
     app.on_startup.append(init_redis)
+    app.on_shutdown.append(shutdown)
 
     return app
+
+async def shutdown(app):
+    for ws in app['websockets'].values():
+        await ws.close()
+    app['websockets'].clear()
+
 
 def main():
     app = init_app()
@@ -31,4 +38,5 @@ def main():
     return app
 
 
-app = main()
+if __name__ == '__main__':
+    main()

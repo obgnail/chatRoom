@@ -19,8 +19,50 @@
     </style>
 {% endblock mycss %}
 
-{% block myjs %}
 
+{% block content %}
+
+<body style="padding: 30px">
+<br/>
+
+<form action="/history/" method="post">
+<input name="userid" value='{{ name }}' hidden>
+<input type="submit" value="查看历史记录"/>
+
+
+<br/> 
+<span id="userid">当前账号：</span>
+<p id='userkey' hidden>{{ name }}</p>
+
+<table>
+    <tr>
+        <td style="width: 500px;">
+            <div id="historymsg" style="height: 400px;overflow: auto"></div>
+        </td>
+        <td style="width: 400px">
+            <div id="userlist" style="height: 400px;overflow: auto"></div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <textarea id="msg"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <select class="form-control" id="isgroup">
+            </select>
+            <input class="btn btn-info btn-block" type="button" onclick="send()" value="发送">
+        </td>
+    </tr>
+</table>
+
+</body>
+{% endblock content %}
+
+
+
+{% block myjs %}
 <script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
 
 <script>
@@ -108,40 +150,3 @@
 
 
 {% endblock myjs %} 
-
-
-{% block content %}
-
-<body style="padding: 30px">
-<br/>
-
-
-<br/> 
-<span id="userid">当前账号：</span>
-<p id='userkey' hidden>{{ name }}</p>
-
-<table>
-    <tr>
-        <td style="width: 500px;">
-            <div id="historymsg" style="height: 400px;overflow: auto"></div>
-        </td>
-        <td style="width: 400px">
-            <div id="userlist" style="height: 400px;overflow: auto"></div>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <textarea id="msg"></textarea>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <select class="form-control" id="isgroup">
-            </select>
-            <input class="btn btn-info btn-block" type="button" onclick="send()" value="发送">
-        </td>
-    </tr>
-</table>
-
-</body>
-{% endblock content %}

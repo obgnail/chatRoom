@@ -1,0 +1,34 @@
+{% extends 'base.html' %} 
+
+{% block title %} 
+    网络聊天室 | 凉薄
+{% endblock title %} 
+
+
+{% block content %}
+
+<body style="padding: 30px">
+<br/>
+以往记录
+
+<table border="1">
+    <tr>
+        <td>发生时间</td>
+        <td>发送方</td>
+        <td>接收方</td>
+        <td>内容</td>
+    </tr>
+
+{% for msg in message %}
+    <tr>
+        <td>{{ msg.createtime }}</td>
+        <td>{{ msg.from_user }}</td>
+        <td>{{ msg.to_user }}</td>
+        <td>{{ msg.content }}</td>
+    </tr>
+{% endfor %}
+
+</table>
+
+</body>
+{% endblock content %}

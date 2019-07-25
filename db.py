@@ -14,7 +14,7 @@ from settings import DATABASE,REDIS
 pymysql.install_as_MySQLdb()
 
 connect = 'mysql+mysqlconnector://{user}:{password}@{host}/{database}?{charset}'
-print('======== mysql connect sussessful ========')
+print('======== connect mysql sussessful ========')
 engine = create_engine(connect.format(**DATABASE),echo=DATABASE['echo'])
 
 Base = declarative_base(engine)
@@ -53,6 +53,7 @@ class Message(Base):
 
 async def init_redis(app):
     r = redis.StrictRedis(host=REDIS['HOST'],port=REDIS['POST'],db=REDIS['DB'],decode_responses=True)
+    print('======== connect redis sussessful ========')
     app['redis'] = r
 
 
