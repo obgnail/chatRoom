@@ -4,9 +4,6 @@ import redis
 import jinja2
 import aiohttp_jinja2
 from aiohttp import web
-from aiohttp_session import setup
-from aiohttp_session.cookie_storage import EncryptedCookieStorage
-from cryptography import fernet
 
 from db import init_redis
 from routes import setup_routes,setup_static_routes
@@ -22,13 +19,9 @@ async def init_app():
     setup_routes(app)
     setup_static_routes(app)
 
-    app.on_startup.append(init_redis)
+    app['websockets'] = {}
 
-    # 设置secret_key
-    fernet_key = fernet.Fernet.generate_key()
-    # secret_key必须是32位的url安全的经过base64编码的字节
-    secret_key = base64.urlsafe_b64decode(fernet_key)
-    setup(app, EncryptedCookieStorage(secret_key))
+    app.on_startup.append(init_redis)
 
     return app
 

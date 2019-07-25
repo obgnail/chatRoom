@@ -20,9 +20,12 @@
 {% endblock mycss %}
 
 {% block myjs %}
+
 <script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+
 <script>
-    function websocket_func(username) {
+    window.onload = function() {
+        var username = $('#userkey').text()
         var ws,myid;
         // 打开一个 web socket,链接服务器
         var wsUri = (window.location.protocol == 'https:' && 'wss://' || 'ws://') + window.location.host + '/chat/';
@@ -35,6 +38,7 @@
         ws.onmessage = function (evt) {
             //获取服务器发来的消息
             var received_msg = evt.data;
+            console.log(received_msg);
             //判断是返回的是消息还是用户列表和id，1是消息，0是用户列表和id
             msg = eval("(" + received_msg + ")")
             //用户列表和id
@@ -79,13 +83,13 @@
     function send() {
         msgtxt = $("#msg").val()
         msguser = $("#isgroup").val()
+        myid = $("#userid").text().split("：")[1]
         //判断是否是群发,1是群发，0是私聊
         if ($("#isgroup").val() == "1") {
             msg = {
                 type: "1",
                 txt: msgtxt,
                 userfrom: myid,
-                'csrfmiddlewaretoken':'{{ csrf_token }}',
             }
         } else {
             msg = {
@@ -93,55 +97,28 @@
                 txt: msgtxt,
                 userto: msguser,
                 userfrom: myid,
-                'csrfmiddlewaretoken':'{{ csrf_token }}',
             }
         }
-        $.post("/", msg, function () {
+        $.post("/msg_send/", msg, function () {
             $("#msg").val("")
             $("#msg").focus()
         })
     }
 </script>
 
-<script>
-    function login_func() {
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "/login/",
-            data: $('#login_form').serialize(),
-            success: function(res, textStatus) {
-                if (textStatus == 'success' && res) {
-                    if(res['status'] == 1) {
-                        var username = res['username']
-                        websocket_func(username);
-                    }else{
-                        alert("用户已存在");
-                    }
-                }
-                else{
-                    alert("error");
-                }
-            }
-        });
-    }
-</script>
+
 {% endblock myjs %} 
 
 
 {% block content %}
 
 <body style="padding: 30px">
-<span>基于 WebSocket ，如显示 "您的浏览器不支持 WebSocket! " ,请退出</span>
 <br/>
-<form id='login_form'>
-    <input type="text" placeholder="用户名(不填则默认匿名)" name="user">
-    <input type="password" placeholder="密码" name="password"/>
-    <button type="button" onclick="login_func()">开始聊天</button>
-</form>
+
 
 <br/> 
 <span id="userid">当前账号：</span>
+<p id='userkey' hidden>{{ name }}</p>
 
 <table>
     <tr>

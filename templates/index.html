@@ -22,28 +22,7 @@
     }
 </script>
 
-<script>
-    function login_func() {
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            url: "/login/",
-            data: $('#login_form').serialize(),
-            success: function(res, textStatus) {
-                if (textStatus == 'success' && res) {
-                    if(res['status'] == 0) {
-                        alert("用户名不存在或密码错误");
-                    }else{
-                        location.href="/chat/";
-                    }
-                }
-                else{
-                    alert("error");
-                }
-            }
-        });
-    }
-</script>
+
 
 {% endblock myjs %} 
 
@@ -58,10 +37,11 @@
     <button id='anonymous' type="button" onclick="/" >匿名聊天</button>
  
     <br/><br/>
-    <form id='login_form' action='/login/' method='post'>
+    {{ msg }}
+    <form action='/login/' method='post'>
         <input type="text" placeholder="用户名" name="user">
         <input type="password" placeholder="密码" name="password"/>
-        <button type="button" onclick="/" >登录</button>
+        <input type="submit" value="登录"/>
     </form>
 
     <br/><br/>
